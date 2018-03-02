@@ -14,10 +14,12 @@ Specs:
   
 * Input: CHIP-8 uses a keypad with 16 keys, corresponding to 0-F in hexadecimal. Usually, 8, 4, 6, and 2 are used for directional control. The keypad is laid out like so: (with default keybindings on the right)  
   
+```
 	1 2 3 C  ->  7 8 9 *  
 	4 5 6 D  ->  4 5 6 -  
 	7 8 9 E  ->  1 2 3 +  
 	A 0 B F  ->  R 0 . E  
+```
   
 	(Note: R = right arrow, E = enter. All keys are on the keyboard keypad)  
   
