@@ -1,3 +1,4 @@
 chip8
 CHIP8/
 src/objs/
+test.c

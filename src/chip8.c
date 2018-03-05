@@ -17,6 +17,8 @@
 #include "low.h"
 
 
+void print_stuff(); // FIXME TEMP
+
 
 char g_quit = 0;
 
@@ -68,7 +70,6 @@ void chip8_init() {
     mem_loadsprites();
 
     memset (stack, 0, STACKSIZE);
-
     srand (time (NULL));
 
     sp = 0;
@@ -103,6 +104,7 @@ void chip8_load (char *fname) {
 
     read (fd, memory+512, length);
 
+    close (fd);
 }
 
 /* chip8_cycle: do an emulation cycle */
@@ -115,9 +117,10 @@ void chip8_cycle() {
     }
 
     log ("%i: ", pc);
-    pc += 2;
 
     cpu_handle_opcode (opcode);
+
+    pc += 2;
 
     if (delay_timer > 0)
         delay_timer--;
@@ -125,6 +128,8 @@ void chip8_cycle() {
         low_buzzer();
         sound_timer--;
     }
+
+    print_stuff();
 }
 
 /* chip8_draw: draw the screen */
@@ -135,5 +140,35 @@ void chip8_draw() {
 /* chip8_input: get input */
 void chip8_input() {
     IO_keystate();
+}
+
+
+/* FIXME TEMP print_stuff: print the registers, stack, etc. */
+void print_stuff() {
+
+    if (G_IO_loglevel == IO_STANDARD)
+        return;
+
+    logv ("REGISTERS\n");
+    logv ("=========\n");
+    for (int x = 0; x < 16; ++x)
+        logv ("V%x = %hhu\n", x, V[x]);
+    logv ("I = %hu\n", I);
+
+    logv ("\nTIMERS\n");
+    logv ("======\n");
+    logv ("dt = %hhu\n", delay_timer);
+    logv ("st = %hhu\n", sound_timer);
+
+    logv ("\nSTACK\n");
+    logv ("=====\n");
+    if (sp > 0) {
+        for (unsigned char i = 0; i < sp-1; ++i)
+            logv ("%hhu  %hu\n", i, stack[i]);
+        logv ("%hhu> %hu\n", sp-1, stack[sp-1]);
+    }
+    else
+        logv ("-\n");
+    logv ("\n");
 }
 

@@ -12,6 +12,8 @@
 #include "low.h"
 
 
+void display_print();   // FIXME : temp
+
 
 char G_display_dodraw = 0;
 
@@ -20,15 +22,14 @@ char G_display_dodraw = 0;
     returns 1 if a byte was turned off */
 int display_draw (unsigned char x, unsigned char y, uint16_t bytes) {
 
-    if (x > SCR_W)
-        error ("display_draw - x out of range (%i/%i)\n", x, SCR_W);
-    if (y > SCR_H)
-        error ("display_draw - y out of range (%i/%i)\n", y, SCR_H);
+    x %= SCR_W;
+    y %= SCR_H;
 
     int collide = 0;
     unsigned char pre;
     G_display_dodraw = 1;
 
+    // 0 bytes draws an 8x16 sprite
     if (bytes == 0) {
         for (int i = 0; i < 16; ++i)
             for (int b = 0; b < 8; ++b) {
@@ -36,17 +37,16 @@ int display_draw (unsigned char x, unsigned char y, uint16_t bytes) {
                 if ((display[x+b][y+i] ^= 1) == 0 && pre)
                     collide = 1;
             }
-        return collide;
     }
-
-    // draw
-    for (int i = 0; i < bytes; ++i)
-        for (int b = 0; b <= 8; ++b) {
-            pre = display[x+b][y+i];
-            if ((display[x+b][y+i] ^= (mem_get (I+i) & (1 << (8-b)))) == 0
-             && pre)
-                collide = 1;
-        }
+    else {
+        for (int i = 0; i < bytes; ++i)
+            for (int b = 0; b < 8; ++b) {
+                pre = display[x+b][y+i];
+                if ((display[x+b][y+i] ^= (mem_get (I+i)
+                 & (1 << (7-b)))) == 0 && pre)
+                    collide = 1;
+            }
+    }
 
     return collide;
 }
@@ -54,17 +54,30 @@ int display_draw (unsigned char x, unsigned char y, uint16_t bytes) {
 /* display_update: update the screen */
 void display_update() {
 
-    for (int y = 0; y <= SCR_H; ++y) {
-        for (int x = 0; x <= SCR_W; ++x) {
+    for (int y = 0; y < SCR_H; ++y) {
+        for (int x = 0; x < SCR_W; ++x) {
             low_drawpixel (x, y, display[x][y]);
         }
     }
     low_update();
     G_display_dodraw = 0;
+    display_print();
 }
 
+/* display_clear: clear screen */
 void display_clear() {
-    memset (display, 0, (SCR_W+1)*(SCR_H+1));
+    memset (display, 0, SCR_W*SCR_H);
     G_display_dodraw = 1;
 }
 
+
+// FIXME TEMP
+void display_print() {
+    return;
+    for (int y = 0; y < SCR_H; ++y) {
+        for (int x = 0; x < SCR_W; ++x)
+            putchar (display[x][y]? '1' : '0');
+        putchar ('\n');
+    }
+    putchar ('\n');
+}

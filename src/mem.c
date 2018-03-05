@@ -4,8 +4,7 @@
  */
 
 #include "mem.h"
-
-#include <stdio.h>  // FIXME TEMP
+#include "io.h"
 
 
 
@@ -37,16 +36,35 @@ void mem_loadsprites() {
 
 /* mem_set: set a byte in memory */
 unsigned char mem_set (uint16_t byte, unsigned char data) {
+    if (byte < 0x200)
+        error ("mem_set - overwriting ROM! (%hu)\n", byte);
+    if (byte > 0xFFF)
+        fatal ("mem_set - address %u is out of range!\n", byte);
     return memory[byte] = data;
 }
 
 /* mem_get: get a byte from memory */
 unsigned char mem_get (uint16_t byte) {
+    if (byte > 0xFFF)
+        fatal ("mem_get - address %u is out of range!\n", byte);
     return memory[byte];
 }
 
-/* mem_sprite: return the first byte of the font for char c */
+/* mem_sprite: return the index of the font for char c */
 uint16_t mem_sprite (unsigned char c) {
     return c*5;
+}
+
+/* FIXME TEMP mem_print: print memory */
+void mem_print() {
+
+    puts ("MEMORY");
+    for (int i = 0; i < 0x200 && memory[i] != 0; ++i) {
+        printf ("%.3X ", i);
+        for (int b = 0; b < 8; ++b)
+            putchar ((memory[i] & (1 << (7-b)))? '1' : '0');
+        putchar ('\n');
+    }
+    puts ("DONE MEMORY\n");
 }
 

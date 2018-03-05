@@ -119,8 +119,8 @@ void low_drawpixel (unsigned int x, unsigned int y,
         fatal ("low_drawpixel - y (%i) out of range (%i)\n",
             y, SCR_H);
 
-    x -= 1;
-    y -= 1;
+    //x -= 1;
+    //y -= 1;
     x *= G_scale;
     y *= G_scale;
 

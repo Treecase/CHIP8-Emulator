@@ -25,6 +25,8 @@ unsigned char mem_get (uint16_t byte);
 
 uint16_t mem_sprite (unsigned char c);
 
+void mem_print();
+
 
 #endif
 
