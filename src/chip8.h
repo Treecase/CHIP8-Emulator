@@ -9,6 +9,7 @@
 
 
 extern char g_quit;
+extern double G_speed;
 
 
 char *chip8_args (int argc, char *argv[]);

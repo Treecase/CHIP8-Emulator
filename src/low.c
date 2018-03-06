@@ -18,6 +18,7 @@ Window          window;
 GC              white;
 GC              black;
 unsigned int    G_scale = 1;
+Pixmap          buffer;
 
 
 /* low_initdisplay: initialize the display */
@@ -31,7 +32,7 @@ void low_initdisplay() {
     unsigned long c_white = WhitePixel (conn, DefaultScreen (conn));
 
     window = XCreateSimpleWindow (conn, XDefaultRootWindow (conn),
-        0,0, SCR_W*G_scale, SCR_H*G_scale, 0, c_black, c_black);
+        0,0, REAL_W,REAL_H, 0, c_black, c_black);
     XMapWindow (conn, window);
 
     XSelectInput (conn, window, StructureNotifyMask | KeyPressMask
@@ -46,6 +47,9 @@ void low_initdisplay() {
 
     XStoreName (conn, window, "CHIP-8");
 
+    buffer = XCreatePixmap (conn, window, REAL_W,REAL_H,
+        DefaultDepth (conn, DefaultScreen (conn)));
+
     // wait for window to be mapped
     XEvent e;
     while (1) {
@@ -54,11 +58,13 @@ void low_initdisplay() {
             break;
     }
 
-    logv ("screen: %ix%i\n", SCR_W*G_scale, SCR_H*G_scale);
+    logd ("screen: %ix%i\n", REAL_W, REAL_H);
 }
 
 /* low_cleanup: clean up */
 void low_cleanup() {
+
+    XFreePixmap (conn, buffer);
     XFreeGC (conn, white);
     XFreeGC (conn, black);
     XCloseDisplay (conn);
@@ -78,7 +84,7 @@ unsigned char low_readkey() {
         case KeyPress:
             XLookupString ((XKeyEvent *)&e, sym, 20, &keysym, NULL);
             for (int i = 0; i < 16; ++i) {
-                if (keysym == keybinds[i]) {
+                if (keysym == keybinds[i] || keysym == altbinds[i]) {
                     keypad[i] = 1;
                     if (firstpressed < 0)
                         firstpressed = i;
@@ -86,7 +92,6 @@ unsigned char low_readkey() {
             }
             if (keysym == KEYBIND_EXIT)
                 return g_quit = 1;
-            XFlush (conn);
             break;
         }
     }
@@ -119,25 +124,23 @@ void low_drawpixel (unsigned int x, unsigned int y,
         fatal ("low_drawpixel - y (%i) out of range (%i)\n",
             y, SCR_H);
 
-    //x -= 1;
-    //y -= 1;
     x *= G_scale;
     y *= G_scale;
 
     GC gc = on? white : black;
 
-    for (int i = 0; i <= G_scale; ++i)
-        for (int j = 0; j <= G_scale; ++j)
-            XDrawPoint (conn, window, gc, x+i, y+j);
+    XFillRectangle (conn, buffer, gc, x,y, G_scale,G_scale);
 }
 
-/* low_update: update the screen*/
+/* low_update: update the screen */
 void low_update() {
+    XCopyArea (conn, buffer, window, white, 0,0,
+        REAL_W,REAL_H, 0,0);
     XFlush (conn);
 }
 
 /* low_buzzer: sound the buzzer */
 void low_buzzer() {
-    XBell (conn, 100);
+    XBell (conn, 100);  // doesn't work?
 }
 

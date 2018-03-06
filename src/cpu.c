@@ -19,10 +19,11 @@ unsigned char   V[16], sp, delay_timer, sound_timer;
 
 
 
+
 /* handle_opcode: interpret an opcode */
 void cpu_handle_opcode (uint16_t code) {
 
-    logv ("opcode %.4hX\n", code);
+    logd ("opcode %.4hX\n", code);
 
     uint16_t        NNN;
     unsigned char   NN, N, x, y;
@@ -43,6 +44,8 @@ void cpu_handle_opcode (uint16_t code) {
             break;
         // return from subroutine
         case 0x00EE:
+            if (sp <= 0)
+                fatal ("cpu_handle_opcode - return past 0!\n");
             pc = stack[--sp];
             log ("ret %u\n", pc);
             break;
@@ -60,6 +63,8 @@ void cpu_handle_opcode (uint16_t code) {
 
     // 2NNN: call func @ NNN
     case 0x2000:
+        if (sp > 16)
+            fatal ("cpu_handle_opcode - stack overflow!\n");
         stack[sp++] = pc;
         pc = NNN-2;
         log ("call %u\n", NNN);
@@ -96,7 +101,7 @@ void cpu_handle_opcode (uint16_t code) {
     // 6xNN: set Vx = NN
     case 0x6000:
         V[x] = NN;
-        log ("set V%x = %hhu\n", x, NN);
+        log ("set V%x = %hhu\n", x, V[x]);
         break;
 
     // 7xNN: add NN to Vx
@@ -135,14 +140,14 @@ void cpu_handle_opcode (uint16_t code) {
 
         // 8xy4: set Vx = Vx + Vy, VF = carry
         case 0x0004:
-            V[0xF] = (V[y] > V[x])? 1 : 0;
+            V[0xF] = (V[y] > V[x])? 1 : 0;  //((V[y] + V[x]) > 255)? 1 : 0;
             V[x] += V[y];
             log ("V%x + V%x (=%hhu, Vf=%hhu)\n", x, y, V[x], V[0xF]);
             break;
 
         // 8xy5: set Vx = Vx - Vy, VF = !carry
         case 0x0005:
-            V[0xF] = (V[x] > V[y])? 1 : 0;  // >= ?
+            V[0xF] = (V[y] > V[x])? 0 : 1;
             V[x] -= V[y];
             log ("V%x - V%x (=%hhu,Vf=%hhu)\n", x, y, V[x], V[0xF]);
             break;
@@ -156,7 +161,7 @@ void cpu_handle_opcode (uint16_t code) {
 
         // 8xy7: set Vx = Vy - Vx, VF = !carry
         case 0x0007:
-            V[0xF] = (V[x] > V[y])? 0 : 1;  // >= ?
+            V[0xF] = (V[x] > V[y])? 0 : 1;
             V[x] = V[y] - V[x];
             log ("V%x - V%x (=%hhu,Vf=%hhu)\n", y, x, V[x], V[0xF]);
             break;
@@ -184,8 +189,8 @@ void cpu_handle_opcode (uint16_t code) {
 
     // ANNN: set I = NNN
     case 0xA000:
-        log ("set I = %hu\n", NNN);
         I = NNN;
+        log ("set I = %hu\n", I);
         break;
 
     // BNNN: jump to NNN + V0
@@ -196,7 +201,7 @@ void cpu_handle_opcode (uint16_t code) {
 
     // CxNN: set Vx = randbyte & NN
     case 0xC000:
-        V[x] = (rand() % 255) & NN;
+        V[x] = (rand() % 0xFF) & NN;
         log ("set V%x = rand & %hhu (=%hhu)\n", x, NN, V[x]);
         break;
 

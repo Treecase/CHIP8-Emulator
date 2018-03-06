@@ -55,16 +55,3 @@ uint16_t mem_sprite (unsigned char c) {
     return c*5;
 }
 
-/* FIXME TEMP mem_print: print memory */
-void mem_print() {
-
-    puts ("MEMORY");
-    for (int i = 0; i < 0x200 && memory[i] != 0; ++i) {
-        printf ("%.3X ", i);
-        for (int b = 0; b < 8; ++b)
-            putchar ((memory[i] & (1 << (7-b)))? '1' : '0');
-        putchar ('\n');
-    }
-    puts ("DONE MEMORY\n");
-}
-

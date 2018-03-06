@@ -37,9 +37,10 @@ int main (int argc, char *argv[]) {
         if (G_display_dodraw)
             chip8_draw();
 
+        // TODO handle the timing properly
         do {    // lock cycles @ 60hz
             clock_gettime (CLOCK_REALTIME, &tspec);
-        } while (tspec.tv_nsec - starttime < 10000000/6.0);
+        } while (tspec.tv_nsec - starttime < G_speed * 10000000/6.0);
     }
 
     chip8_cleanup();

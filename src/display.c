@@ -12,9 +12,6 @@
 #include "low.h"
 
 
-void display_print();   // FIXME : temp
-
-
 char G_display_dodraw = 0;
 
 
@@ -42,8 +39,8 @@ int display_draw (unsigned char x, unsigned char y, uint16_t bytes) {
         for (int i = 0; i < bytes; ++i)
             for (int b = 0; b < 8; ++b) {
                 pre = display[x+b][y+i];
-                if ((display[x+b][y+i] ^= (mem_get (I+i)
-                 & (1 << (7-b)))) == 0 && pre)
+                if ((display[x+b][y+i] ^= ((mem_get (I+i)
+                 & (128 >> b)) >> (7-b))) == 0 && pre)
                     collide = 1;
             }
     }
@@ -61,7 +58,6 @@ void display_update() {
     }
     low_update();
     G_display_dodraw = 0;
-    display_print();
 }
 
 /* display_clear: clear screen */
@@ -70,14 +66,3 @@ void display_clear() {
     G_display_dodraw = 1;
 }
 
-
-// FIXME TEMP
-void display_print() {
-    return;
-    for (int y = 0; y < SCR_H; ++y) {
-        for (int x = 0; x < SCR_W; ++x)
-            putchar (display[x][y]? '1' : '0');
-        putchar ('\n');
-    }
-    putchar ('\n');
-}

@@ -17,10 +17,11 @@
 #include "low.h"
 
 
-void print_stuff(); // FIXME TEMP
+void debug_dump();
 
 
 char g_quit = 0;
+double G_speed = 1;
 
 
 /* chip8_args: handle argv */
@@ -47,7 +48,14 @@ char *chip8_args (int argc, char *argv[]) {
             if (i+1 < argc)
                 G_scale = atoi (argv[++i]);
             else
-                fatal ("chip8_args - missing scale!\n", argv[i]);
+                fatal ("chip8_args - missing scale! %s\n", argv[i]);
+        }
+        else if (!strcmp (argv[i], "-t")
+         || !strcmp (argv[i], "--speed")) {
+            if (i+1 < argc)
+                G_speed = 1 / atof (argv[++i]);
+            else
+                fatal ("chip8_args - missing speed! %s\n", argv[i]);
         }
 
         else if (!in_file)      // not a recognized arg, filename?
@@ -129,7 +137,7 @@ void chip8_cycle() {
         sound_timer--;
     }
 
-    print_stuff();
+    debug_dump();
 }
 
 /* chip8_draw: draw the screen */
@@ -143,32 +151,32 @@ void chip8_input() {
 }
 
 
-/* FIXME TEMP print_stuff: print the registers, stack, etc. */
-void print_stuff() {
+/* debug_dump: dump registers, stack, etc. */
+void debug_dump() {
 
-    if (G_IO_loglevel == IO_STANDARD)
+    if (G_IO_loglevel != IO_DEBUG)
         return;
 
-    logv ("REGISTERS\n");
-    logv ("=========\n");
+    logd ("REGISTERS\n");
+    logd ("=========\n");
     for (int x = 0; x < 16; ++x)
-        logv ("V%x = %hhu\n", x, V[x]);
-    logv ("I = %hu\n", I);
+        logd ("V%x = %hhu\n", x, V[x]);
+    logd ("I = %hu\n", I);
 
-    logv ("\nTIMERS\n");
-    logv ("======\n");
-    logv ("dt = %hhu\n", delay_timer);
-    logv ("st = %hhu\n", sound_timer);
+    logd ("\nTIMERS\n");
+    logd ("======\n");
+    logd ("dt = %hhu\n", delay_timer);
+    logd ("st = %hhu\n", sound_timer);
 
-    logv ("\nSTACK\n");
-    logv ("=====\n");
+    logd ("\nSTACK\n");
+    logd ("=====\n");
     if (sp > 0) {
         for (unsigned char i = 0; i < sp-1; ++i)
-            logv ("%hhu  %hu\n", i, stack[i]);
-        logv ("%hhu> %hu\n", sp-1, stack[sp-1]);
+            logd ("%hhu  %hu\n", i, stack[i]);
+        logd ("%hhu> %hu\n", sp-1, stack[sp-1]);
     }
     else
-        logv ("-\n");
-    logv ("\n");
+        logd ("-\n");
+    logd ("\n");
 }
 

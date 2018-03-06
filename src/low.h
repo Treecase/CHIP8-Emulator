@@ -8,6 +8,10 @@
 #define _LOW_H
 
 
+#define REAL_W  (SCR_W * G_scale)
+#define REAL_H  (SCR_H * G_scale)
+
+
 extern unsigned int G_scale;
 
 void low_initdisplay();

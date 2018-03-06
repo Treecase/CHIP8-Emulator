@@ -17,6 +17,7 @@
 
 
 int keybinds[16] = { DEFAULT_KEYBINDS };
+int altbinds[16] = { DEFAULT_ALTBINDS };
 
 int G_IO_loglevel = IO_STANDARD;
 
@@ -79,5 +80,6 @@ void IO_print_help (char *name) {
     puts (" -d, --debug\tdebug logging, verbose + opcodes");
     puts (" -h, --help\tdisplay this help and exit");
     puts (" -s, --scale N\tscale display by N times");
+    puts (" -t, --speed N\tset emulation speed");
 }
 

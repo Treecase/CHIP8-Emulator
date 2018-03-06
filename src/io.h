@@ -30,7 +30,7 @@ extern int G_IO_loglevel;
                     exit (-1);}
 
 #define log(...)    IO_log (IO_VERBOSE, __VA_ARGS__)
-#define logv(...)   IO_log (IO_DEBUG,   __VA_ARGS__)
+#define logd(...)   IO_log (IO_DEBUG,   __VA_ARGS__)
 
 /*  0 1 2 3  >  1 2 3 C
     4 5 6 7  >  4 5 6 D
@@ -43,11 +43,19 @@ extern int G_IO_loglevel;
                             XK_KP_Multiply,XK_KP_Subtract,XK_KP_Add,\
                             XK_KP_Enter
 
+#define DEFAULT_ALTBINDS    XK_KP_Insert,XK_KP_Home,XK_KP_Up,       \
+                            XK_KP_Page_Up,XK_KP_Left,XK_KP_Begin,   \
+                            XK_KP_Right,XK_KP_End,XK_KP_Down,       \
+                            XK_KP_Page_Down,XK_Right,XK_KP_Delete,  \
+                            XK_KP_Multiply,XK_KP_Subtract,XK_KP_Add,\
+                            XK_KP_Enter
+
 #define KEYBIND_EXIT        XK_Escape
 
 
 unsigned char   keypad[16];
 extern int      keybinds[16];
+extern int      altbinds[16];
 
 
 unsigned char IO_keydown (unsigned char key);

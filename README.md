@@ -1,12 +1,13 @@
   
+
 A [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8) virtual machine/emulator.  
   
   
 Specs:  
   
-* Memory: 4096 bytes, of which the first 512 contain the character graphics.  
+* Memory: 4096 bytes (4k), of which the first 512 contain the character graphics.  
   
-* Registers: 16 8-bit registers, labeled V0-VF. VF is used as a flag for some instructions. There is also a memory register, I, which is 16 bits.  
+* Registers: 16 8-bit registers, labeled V0-VF. VF is used as a flag for some instructions. There is also a memory index register, I, which is 16 bits.  
   
 * Stack: The stack has 16 levels.  
   
@@ -21,7 +22,7 @@ Specs:
 	A 0 B F  ->  R 0 . E  
 ```
   
-	(Note: R = right arrow, E = enter. All keys are on the keyboard keypad)  
+	(Note: R = right arrow, E = enter. Keys are on the keyboard keypad)  
   
 * Graphics: The display is 64x32 pixels monochrome. Sprites are 8 pixels wide, and between 1 and 15 pixels tall.  
 
